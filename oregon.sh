@@ -4,6 +4,9 @@
 # PROGRAMMING REVISIONS BY DON RAWITSCH - 3/27/75
 # MINNESOTA EDUCATIONAL COMPUTING CONSORTIUM STAFF
 
+purchaseValue=-1
+AnimalSpend=0
+
 instructions() {
     echo;echo
     echo "This program simulates a trip over the Oregon Trail from"
@@ -49,8 +52,45 @@ instructions() {
     echo "Good luck!!!"
 }
 
+purchase() {
+    purchaseValue=-1
+    prompt=$1
+    minRequired=$2
+    maxAllowed=$3
+    
+    until [ $purchaseValue -gt -1 ]
+    do
+        echo -n "How much do you want to spend on $prompt? "
+        read x
+        if [ $x -lt $minRequired ]
+            then echo "Not enough";
+            else if [ $x -gt $maxAllowed ]
+                then echo "Too much"
+                else purchaseValue=$x
+            fi
+        fi
+    done
+}
+
+init(){
+    X1=-1
+    K8=0
+    S4=0
+    F1=0
+    F2=0
+    M=0
+    M9=0
+    D3=0
+    
+    echo;echo
+    purchase "your oxen team" 200 300
+    AnimalSpend=$purchaseValue
+}
+
 echo -n "Do you need instructions (yes/no) "
 read choice
 if [ "$choice" == "yes" ]; then 
     instructions
 fi
+
+init

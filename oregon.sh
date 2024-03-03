@@ -5,7 +5,15 @@
 # MINNESOTA EDUCATIONAL COMPUTING CONSORTIUM STAFF
 
 purchaseValue=-1
+
 AnimalSpend=0
+AmmoSpend=0
+ClothingSpend=0
+FoodSpend=0
+MiscSuppliesSpend=0
+
+startingBudget=700
+cashLeft=$startingBudget
 
 instructions() {
     echo;echo
@@ -52,7 +60,7 @@ instructions() {
     echo "Good luck!!!"
 }
 
-purchase() {
+rangedPurchase() {
     purchaseValue=-1
     prompt=$1
     minRequired=$2
@@ -72,6 +80,46 @@ purchase() {
     done
 }
 
+purchase() {
+    purchaseValue=-1
+    prompt=$1
+    
+    until [ $purchaseValue -ge 0 ]
+    do
+        echo -n "How much do you want to spend on $prompt? "
+        read purchaseValue
+        if [ $purchaseValue -lt 0 ];then echo "Impossible";fi
+    done
+}
+
+preparations() {    
+    preparationsComplete=false
+    until [ $preparationsComplete == true ]
+    do
+        echo;echo
+        rangedPurchase "your oxen team" 200 300; AnimalSpend=$purchaseValue
+        purchase "food"; FoodSpend=$purchaseValue
+        purchase "ammunition"; AmmoSpend=$purchaseValue
+        purchase "clothing"; ClothingSpend=$purchaseValue
+        purchase "miscellaneous supplies"; MiscSuppliesSpend=$purchaseValue
+        
+        cashLeft=$((startingBudget - AnimalSpend - FoodSpend - AmmoSpend - ClothingSpend \
+                - MiscSuppliesSpend))
+            
+        if [ $cashLeft -lt 0 ]
+          then echo "You overspent--you only had \$$startingBudget to spend. Buy again."
+          else preparationsComplete=true
+        fi
+        
+    done
+    
+    ammoSpend=$((50 * AmmonSpend))
+    echo "After all your purchases, you now have $cashLeft dollars left."
+    echo
+    echo "Monday, March 29, 1847"
+    echo
+}
+
 init(){
     X1=-1
     K8=0
@@ -82,9 +130,7 @@ init(){
     M9=0
     D3=0
     
-    echo;echo
-    purchase "your oxen team" 200 300
-    AnimalSpend=$purchaseValue
+    preparations
 }
 
 echo -n "Do you need instructions (yes/no) "

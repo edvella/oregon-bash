@@ -14,6 +14,13 @@ MiscSuppliesSpend=0
 
 startingBudget=700
 cashLeft=$startingBudget
+distanceCovered=0
+turnNumber=0
+
+turnDates=("April 12", "April 26", "May 10", "May 24", "June 7", "June 21", \
+           "July 5", "July 19", "August 2", "August 16", "August 31", \
+           "September 13", "September 27", "October 11", "October 25", \
+           "November 8", "November 22")
 
 instructions() {
     echo;echo
@@ -120,17 +127,34 @@ preparations() {
     echo
 }
 
-init(){
+init() {
     X1=-1
     K8=0
     S4=0
     F1=0
     F2=0
-    M=0
+    distanceCovered=0
     M9=0
     D3=0
     
     preparations
+}
+
+printDate() {
+    echo
+    echo "Monday ${turnDates[turnNumber]} 1847"
+    echo
+}
+
+finalTurn() { 
+    echo "todo"
+}
+
+gameLoop() {
+    if [ $distanceCovered -ge 2040 ] || [ $turnNumber -gt 17 ]
+        then finalTurn
+        else printDate
+    fi
 }
 
 echo -n "Do you need instructions (yes/no) "
@@ -140,3 +164,4 @@ if [ "$choice" == "yes" ]; then
 fi
 
 init
+gameLoop

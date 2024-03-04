@@ -7,10 +7,10 @@
 purchaseValue=-1
 
 AnimalSpend=0
-AmmoSpend=0
+ammoLeft=0
 ClothingSpend=0
-FoodSpend=0
-MiscSuppliesSpend=0
+foodLeft=0
+suppliesLeft=0
 
 startingBudget=700
 cashLeft=$startingBudget
@@ -105,13 +105,13 @@ preparations() {
     do
         echo;echo
         rangedPurchase "your oxen team" 200 300; AnimalSpend=$purchaseValue
-        purchase "food"; FoodSpend=$purchaseValue
-        purchase "ammunition"; AmmoSpend=$purchaseValue
+        purchase "food"; foodLeft=$purchaseValue
+        purchase "ammunition"; ammoLeft=$purchaseValue
         purchase "clothing"; ClothingSpend=$purchaseValue
-        purchase "miscellaneous supplies"; MiscSuppliesSpend=$purchaseValue
+        purchase "miscellaneous supplies"; suppliesLeft=$purchaseValue
         
-        cashLeft=$((startingBudget - AnimalSpend - FoodSpend - AmmoSpend - ClothingSpend \
-                - MiscSuppliesSpend))
+        cashLeft=$((startingBudget - AnimalSpend - foodLeft - ammoLeft - ClothingSpend \
+                - suppliesLeft))
             
         if [ $cashLeft -lt 0 ]
           then echo "You overspent--you only had \$$startingBudget to spend. Buy again."
@@ -120,7 +120,7 @@ preparations() {
         
     done
     
-    ammoSpend=$((50 * AmmonSpend))
+    ((ammoLeft*=50))
     echo "After all your purchases, you now have $cashLeft dollars left."
     echo
     echo "Monday, March 29, 1847"
@@ -135,7 +135,7 @@ init() {
     F2=0
     distanceCovered=0
     M9=0
-    D3=0
+    turnNumber=0
     
     preparations
 }
@@ -153,7 +153,30 @@ finalTurn() {
 gameLoop() {
     if [ $distanceCovered -ge 2040 ] || [ $turnNumber -gt 17 ]
         then finalTurn
-        else printDate
+        else {
+            # printDate
+            ((turnNumber++))
+            
+            if [ $foodLeft -lt 0 ]; then foodLeft=0; fi
+            if [ $ammoLeft -lt 0 ]; then ammoLeft=0; fi
+            if [ $ClothingSpend -lt 0 ]; then ClothingSpend=0; fi
+            if [ $suppliesLeft -lt 0 ]; then suppliesLeft=0; fi
+            
+            if [ $foodLeft -lt 12 ]
+                then echo "You'd better do some hunting or buy food and soon!!!!"
+            fi
+            
+            # todo: check for need to possibly round up numbers here (1055 - 1080)
+            mileageAtPreviousTurn=$distanceCovered
+            
+            if [ $isSick ] || [ $isInjured ]
+                then {
+                    ((cashLeft-=20))
+                    echo "Doctor's bill is \$20"
+                    isInjured=false;isSick=false
+                }
+            fi
+        }
     fi
 }
 

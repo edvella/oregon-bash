@@ -6,9 +6,9 @@
 
 purchaseValue=-1
 
-AnimalSpend=0
+animalSpend=0
 ammoLeft=0
-ClothingSpend=0
+clothingSpend=0
 foodLeft=0
 suppliesLeft=0
 
@@ -16,6 +16,10 @@ startingBudget=700
 cashLeft=$startingBudget
 distanceCovered=0
 turnNumber=0
+isInjured=false
+isSick=false
+southPassFlag=false
+canVisitFort=false
 
 turnDates=("April 12", "April 26", "May 10", "May 24", "June 7", "June 21", \
            "July 5", "July 19", "August 2", "August 16", "August 31", \
@@ -104,13 +108,13 @@ preparations() {
     until [ $preparationsComplete == true ]
     do
         echo;echo
-        rangedPurchase "your oxen team" 200 300; AnimalSpend=$purchaseValue
+        rangedPurchase "your oxen team" 200 300; animalSpend=$purchaseValue
         purchase "food"; foodLeft=$purchaseValue
         purchase "ammunition"; ammoLeft=$purchaseValue
-        purchase "clothing"; ClothingSpend=$purchaseValue
+        purchase "clothing"; clothingSpend=$purchaseValue
         purchase "miscellaneous supplies"; suppliesLeft=$purchaseValue
         
-        cashLeft=$((startingBudget - AnimalSpend - foodLeft - ammoLeft - ClothingSpend \
+        cashLeft=$((startingBudget - animalSpend - foodLeft - ammoLeft - clothingSpend \
                 - suppliesLeft))
             
         if [ $cashLeft -lt 0 ]
@@ -128,13 +132,13 @@ preparations() {
 }
 
 init() {
-    X1=-1
-    K8=0
-    S4=0
+    canVisitFort=false
+    isInjured=false
+    isSick=false
     F1=0
     F2=0
     distanceCovered=0
-    M9=0
+    southPassFlag=false
     turnNumber=0
     
     preparations
@@ -150,6 +154,30 @@ finalTurn() {
     echo "todo"
 }
 
+checkIfDoctorNeeded() {
+    if $isSick || $isInjured
+        then {
+            ((cashLeft-=20))
+            echo "Doctor's bill is \$20"
+            isInjured=false;isSick=false
+        }
+    fi
+}
+
+printMileage() {
+    if $southPassFlag
+        then echo "Total mileage is 950"; southPassFlag=false
+        else echo "Total mileage is ${distanceCovered}"
+    fi
+}
+
+printResourceTable() {
+    #printf "Food\tBullets\tClothing\tMisc. Supp.\tCash\n"
+    #("Food", "Bullets", "Clothing", "Misc. Supp.", "Cash") | xargs -n5 printf "%-15s"
+    printf "%-15s%-15s%-15s%-15s%-15s\n" "Food" "Bullets" "Clothing" "Misc. Supp." "Cash"
+    printf "%-15s%-15s%-15s%-15s%-15s\n" "${foodLeft}" "${ammoLeft}" "${clothingSpend}" "${suppliesLeft}" "${cashLeft}"
+}
+
 gameLoop() {
     if [ $distanceCovered -ge 2040 ] || [ $turnNumber -gt 17 ]
         then finalTurn
@@ -159,7 +187,7 @@ gameLoop() {
             
             if [ $foodLeft -lt 0 ]; then foodLeft=0; fi
             if [ $ammoLeft -lt 0 ]; then ammoLeft=0; fi
-            if [ $ClothingSpend -lt 0 ]; then ClothingSpend=0; fi
+            if [ $clothingSpend -lt 0 ]; then clothingSpend=0; fi
             if [ $suppliesLeft -lt 0 ]; then suppliesLeft=0; fi
             
             if [ $foodLeft -lt 12 ]
@@ -169,13 +197,9 @@ gameLoop() {
             # todo: check for need to possibly round up numbers here (1055 - 1080)
             mileageAtPreviousTurn=$distanceCovered
             
-            if [ $isSick ] || [ $isInjured ]
-                then {
-                    ((cashLeft-=20))
-                    echo "Doctor's bill is \$20"
-                    isInjured=false;isSick=false
-                }
-            fi
+            checkIfDoctorNeeded
+            printMileage
+            printResourceTable
         }
     fi
 }

@@ -178,6 +178,35 @@ printResourceTable() {
     printf "%-15s%-15s%-15s%-15s%-15s\n" "${foodLeft}" "${ammoLeft}" "${clothingSpend}" "${suppliesLeft}" "${cashLeft}"
 }
 
+playerMove() {
+    if $canVisitFort
+        then {
+            canVisitFort=false
+            echo "Do you want to (1) stop at the next fort, (2) hunt, or (3) continue"
+            read playerChoice
+            if [ $playerChoice -gt 2 ] || [ $playerChoice -lt 1 ]; then playerChoice=3; fi
+        }        
+        else {
+            isValid=false
+            until $isValid
+            do            
+                echo "Do you want to (1) hunt, or (2) continue"
+                read playerChoice
+                if [ $playerChoice == 1 ]
+                    then {
+                        playerChoice=2
+                        if [ $ammoLeft -lt 40 ]
+                            then echo "Tough---you need more bullets to go hunting"
+                            else isValid=true
+                        fi
+                    }
+                    else playerChoice=3; isValid=true
+                fi
+            done
+        }
+    fi
+}
+
 gameLoop() {
     if [ $distanceCovered -ge 2040 ] || [ $turnNumber -gt 17 ]
         then finalTurn
@@ -200,6 +229,7 @@ gameLoop() {
             checkIfDoctorNeeded
             printMileage
             printResourceTable
+            playerMove
         }
     fi
 }

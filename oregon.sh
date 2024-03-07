@@ -184,7 +184,6 @@ playerMove() {
             canVisitFort=false
             echo "Do you want to (1) stop at the next fort, (2) hunt, or (3) continue"
             read playerChoice
-            if [ $playerChoice -gt 2 ] || [ $playerChoice -lt 1 ]; then playerChoice=3; fi
         }        
         else {
             isValid=false
@@ -203,8 +202,21 @@ playerMove() {
                     else playerChoice=3; isValid=true
                 fi
             done
+            canVisitFort=true
         }
     fi
+    
+    case $playerChoice in
+        1)
+            echo "Stopping at fort"
+            ;;
+        2)
+            echo "Hunting"
+            ;;
+        *)
+            echo "Next turn"
+            ;;
+    esac
 }
 
 gameLoop() {

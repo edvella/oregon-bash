@@ -245,30 +245,34 @@ playerMove() {
 }
 
 gameLoop() {
-    if [ $distanceCovered -ge 2040 ] || [ $turnNumber -gt 17 ]
-        then finalTurn
-        else {
-            # printDate
-            ((turnNumber++))
-            
-            if [ $foodLeft -lt 0 ]; then foodLeft=0; fi
-            if [ $ammoLeft -lt 0 ]; then ammoLeft=0; fi
-            if [ $clothingLeft -lt 0 ]; then clothingLeft=0; fi
-            if [ $suppliesLeft -lt 0 ]; then suppliesLeft=0; fi
-            
-            if [ $foodLeft -lt 12 ]
-                then echo "You'd better do some hunting or buy food and soon!!!!"
-            fi
-            
-            # todo: check for need to possibly round up numbers here (1055 - 1080)
-            mileageAtPreviousTurn=$distanceCovered
-            
-            checkIfDoctorNeeded
-            printMileage
-            printResourceTable
-            playerMove
-        }
-    fi
+    gameOver=false
+    until $gameOver
+    do
+        if [ $distanceCovered -ge 2040 ] || [ $turnNumber -gt 17 ]
+            then finalTurn; ganeOver=true
+            else {
+                # printDate
+                ((turnNumber++))
+                
+                if [ $foodLeft -lt 0 ]; then foodLeft=0; fi
+                if [ $ammoLeft -lt 0 ]; then ammoLeft=0; fi
+                if [ $clothingLeft -lt 0 ]; then clothingLeft=0; fi
+                if [ $suppliesLeft -lt 0 ]; then suppliesLeft=0; fi
+                
+                if [ $foodLeft -lt 12 ]
+                    then echo "You'd better do some hunting or buy food and soon!!!!"
+                fi
+                
+                # todo: check for need to possibly round up numbers here (1055 - 1080)
+                mileageAtPreviousTurn=$distanceCovered
+                
+                checkIfDoctorNeeded
+                printMileage
+                printResourceTable
+                playerMove
+            }
+        fi
+    done
 }
 
 echo -n "Do you need instructions (yes/no) "

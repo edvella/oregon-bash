@@ -8,3 +8,4 @@ Music played during development:
 Tchaikovsky: Swan Lake - performed by the London Symphony Orchestra (1976)
 ...And Justice for All - Metallica (1988)
 Agents of Fortune - Blue Öyster Cult (1976)
+Use Your Illusion I - Guns N' Roses (1991)

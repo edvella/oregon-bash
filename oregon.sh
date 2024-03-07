@@ -8,7 +8,7 @@ purchaseValue=-1
 
 animalSpend=0
 ammoLeft=0
-clothingSpend=0
+clothingLeft=0
 foodLeft=0
 suppliesLeft=0
 
@@ -20,6 +20,7 @@ isInjured=false
 isSick=false
 southPassFlag=false
 canVisitFort=false
+fortSpending=0
 
 turnDates=("April 12", "April 26", "May 10", "May 24", "June 7", "June 21", \
            "July 5", "July 19", "August 2", "August 16", "August 31", \
@@ -111,10 +112,10 @@ preparations() {
         rangedPurchase "your oxen team" 200 300; animalSpend=$purchaseValue
         purchase "food"; foodLeft=$purchaseValue
         purchase "ammunition"; ammoLeft=$purchaseValue
-        purchase "clothing"; clothingSpend=$purchaseValue
+        purchase "clothing"; clothingLeft=$purchaseValue
         purchase "miscellaneous supplies"; suppliesLeft=$purchaseValue
         
-        cashLeft=$((startingBudget - animalSpend - foodLeft - ammoLeft - clothingSpend \
+        cashLeft=$((startingBudget - animalSpend - foodLeft - ammoLeft - clothingLeft \
                 - suppliesLeft))
             
         if [ $cashLeft -lt 0 ]
@@ -175,7 +176,31 @@ printResourceTable() {
     #printf "Food\tBullets\tClothing\tMisc. Supp.\tCash\n"
     #("Food", "Bullets", "Clothing", "Misc. Supp.", "Cash") | xargs -n5 printf "%-15s"
     printf "%-15s%-15s%-15s%-15s%-15s\n" "Food" "Bullets" "Clothing" "Misc. Supp." "Cash"
-    printf "%-15s%-15s%-15s%-15s%-15s\n" "${foodLeft}" "${ammoLeft}" "${clothingSpend}" "${suppliesLeft}" "${cashLeft}"
+    printf "%-15s%-15s%-15s%-15s%-15s\n" "${foodLeft}" "${ammoLeft}" "${clothingLeft}" "${suppliesLeft}" "${cashLeft}"
+}
+
+fortShop() {
+    echo -n "$1 "
+    read fortSpending
+    
+    if [ $fortSpending -gt 0 ]
+        then if [ $cashLeft -ge $fortSpending ]
+            then ((cashLeft-=$fortSpending));
+            else echo "You don't have that much--keep your spending down"; fortSpending=0
+        fi
+    fi
+    
+    ((fortSpending=$fortSpending * 2 / 3))
+}
+
+stopAtFort() {
+    echo "Enter what you wish to spend on the following"
+    fortShop "food";((foodLeft+=fortSpending))
+    fortShop "ammunition";((ammoLeft+=fortSpending * 50))
+    fortShop "clothing";((clothingLeft+=fortSpending))
+    fortShop "miscellaneous supplies";((suppliesLeft+=fortSpending))
+    
+    ((distanceCovered-=45))
 }
 
 playerMove() {
@@ -208,7 +233,7 @@ playerMove() {
     
     case $playerChoice in
         1)
-            echo "Stopping at fort"
+            stopAtFort
             ;;
         2)
             echo "Hunting"
@@ -228,7 +253,7 @@ gameLoop() {
             
             if [ $foodLeft -lt 0 ]; then foodLeft=0; fi
             if [ $ammoLeft -lt 0 ]; then ammoLeft=0; fi
-            if [ $clothingSpend -lt 0 ]; then clothingSpend=0; fi
+            if [ $clothingLeft -lt 0 ]; then clothingLeft=0; fi
             if [ $suppliesLeft -lt 0 ]; then suppliesLeft=0; fi
             
             if [ $foodLeft -lt 12 ]

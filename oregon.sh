@@ -253,6 +253,31 @@ hunt() {
     fi
 }
 
+death() {
+    echo
+    echo "Due to your unfortunate situation, there are a few"
+    echo "formalities we must go through."
+    echo
+    echo "Would you like a minister?"
+    read
+    echo "Would you like a fancy funeral?"
+    read
+    echo "Would you like us to inform yout next of kin?"
+    read playerAnswer
+    if [ $playerAnswer != "yes" ]
+        then echo "Your aunt Nellie in St. Louis is anxious to hear."
+    fi
+    echo "We thank you for this information and we are sorry you"
+    echo "didn't make it to the great territory of Oregon."
+    echo "Better luck next time."
+    echo
+    echo
+    echo -e "\033[30CSincerely"
+    echo
+    echo -e "\033[17CThe Oregon City Chamber of Commerce"
+    exit 0
+}
+
 playerMove() {
     if $canVisitFort
         then {

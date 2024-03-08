@@ -21,6 +21,7 @@ isSick=false
 southPassFlag=false
 canVisitFort=false
 fortSpending=0
+shootingScore=0
 
 turnDates=("April 12", "April 26", "May 10", "May 24", "June 7", "June 21", \
            "July 5", "July 19", "August 2", "August 16", "August 31", \
@@ -208,7 +209,16 @@ stopAtFort() {
 }
 
 shoot() {
-    echo "todo shooting routine"
+    echo "Type bang"
+    startTime=$(date +%s)
+    read -t 7 -N 4
+    endTime=$(date +%s)
+    echo
+    
+    if [ $REPLY == "bang" ]
+        then ((shootingScore=$endTime - startTime))
+        else ((shootingScore=7))
+    fi
 }
 
 hunt() {
@@ -221,10 +231,10 @@ hunt() {
         else {
             slowTurn
             shoot
-            shootingScore=0
+            
             if [ $shootingScore -le 1 ]
                 then {
-                    echo "Right between the eyes---you got a big one!!!!"
+                    printf "Ri\aght betwee\an the eye\as---you got a\a big one!!\a!!\n"
                     ((foodLeft+=52+($RANDOM % 6)))
                     ((ammoLeft-=10+($RANDOM % 4)))
                 }

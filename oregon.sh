@@ -186,11 +186,15 @@ fortShop() {
     if [ $fortSpending -gt 0 ]
         then if [ $cashLeft -ge $fortSpending ]
             then ((cashLeft-=$fortSpending));
-            else echo "You don't have that much--keep your spending down"; fortSpending=0
+            else echo "You don't have that much--keep your spending down."; fortSpending=0
         fi
     fi
     
     ((fortSpending=$fortSpending * 2 / 3))
+}
+
+slowTurn() {
+    ((distanceCovered-=45))
 }
 
 stopAtFort() {
@@ -200,7 +204,43 @@ stopAtFort() {
     fortShop "clothing";((clothingLeft+=fortSpending))
     fortShop "miscellaneous supplies";((suppliesLeft+=fortSpending))
     
-    ((distanceCovered-=45))
+    slowTurn
+}
+
+shoot() {
+    echo "todo shooting routine"
+}
+
+hunt() {
+    if [ $ammoLeft -lt 40 ]
+        then {
+            echo "Tough---you need more bullets to go hunting."
+            canVisitFort=true
+            playerMove
+        }
+        else {
+            slowTurn
+            shoot
+            shootingScore=0
+            if [ $shootingScore -le 1 ]
+                then {
+                    echo "Right between the eyes---you got a big one!!!!"
+                    ((foodLeft+=52+($RANDOM % 6)))
+                    ((ammoLeft-=10+($RANDOM % 4)))
+                }
+                else {
+                    if [ $(( $RANDOM % 100 )) -lt $(( 13 * $shootingScore )) ]
+                        then echo "Sorry---no luck today."
+                        else {
+                            ((foodLeft+=48-(2 * $shootingScore)))
+                            echo "Nice shot---right through the neck--feast tonight!!"
+                            ((ammoLeft-=10+(3 * $shootingScore)))
+                        }
+                    fi
+                }
+            fi
+        }
+    fi
 }
 
 playerMove() {
@@ -220,7 +260,7 @@ playerMove() {
                     then {
                         playerChoice=2
                         if [ $ammoLeft -lt 40 ]
-                            then echo "Tough---you need more bullets to go hunting"
+                            then echo "Tough---you need more bullets to go hunting."
                             else isValid=true
                         fi
                     }
@@ -236,7 +276,7 @@ playerMove() {
             stopAtFort
             ;;
         2)
-            echo "Hunting"
+            hunt
             ;;
         *)
             echo "Next turn"

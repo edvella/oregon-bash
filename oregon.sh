@@ -316,12 +316,31 @@ playerMove() {
     esac
 }
 
-turnEvents() {
+foodCheck() {
     if [ $foodLeft -lt 13 ] 
         then 
             echo "You ran out of food and starved to death"
             deathSequence
     fi
+}
+
+eat() {
+    isEatingCompleted=false
+    until $isEatingCompleted
+    do
+        echo "Do you want to eat (1) poorly  (2) moderately"
+        echo -n "or (3) well? "
+        read mealSize
+        if [ $mealSize -ge 1 ] && [ $mealSize -le 3 ]
+            then if [ $foodLeft -ge $((8 + 5 * $mealSize)) ]
+                then {
+                    foodLeft=$((foodLeft - 8 - (5 * $mealSize)))
+                    isEatingCompleted=true
+                }
+                else echo "You can't eat that well."
+            fi
+        fi
+    done
 }
 
 gameLoop() {
@@ -350,7 +369,13 @@ gameLoop() {
                 printMileage
                 printResourceTable
                 playerMove
-                turnEvents
+                foodCheck
+                eat
+                
+                distanceCovered=$((distanceCovered +(200 + ($animalSpend - 220) / 5 + ($RANDOM % 10))))
+                
+                isBlizzard=false
+                isInsufficientClothing=false
             }
         fi
     done

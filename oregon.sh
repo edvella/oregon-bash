@@ -253,7 +253,7 @@ hunt() {
     fi
 }
 
-death() {
+deathSequence() {
     echo
     echo "Due to your unfortunate situation, there are a few"
     echo "formalities we must go through."
@@ -313,10 +313,15 @@ playerMove() {
         2)
             hunt
             ;;
-        *)
-            echo "Next turn"
-            ;;
     esac
+}
+
+turnEvents() {
+    if [ $foodLeft -lt 13 ] 
+        then 
+            echo "You ran out of food and starved to death"
+            deathSequence
+    fi
 }
 
 gameLoop() {
@@ -345,6 +350,7 @@ gameLoop() {
                 printMileage
                 printResourceTable
                 playerMove
+                turnEvents
             }
         fi
     done

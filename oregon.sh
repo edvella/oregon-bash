@@ -6,7 +6,7 @@
 
 purchaseValue=-1
 
-animalSpend=0
+animalPower=0
 ammoLeft=0
 clothingLeft=0
 foodLeft=0
@@ -110,13 +110,13 @@ preparations() {
     until [ $preparationsComplete == true ]
     do
         echo;echo
-        rangedPurchase "your oxen team" 200 300; animalSpend=$purchaseValue
+        rangedPurchase "your oxen team" 200 300; animalPower=$purchaseValue
         purchase "food"; foodLeft=$purchaseValue
         purchase "ammunition"; ammoLeft=$purchaseValue
         purchase "clothing"; clothingLeft=$purchaseValue
         purchase "miscellaneous supplies"; suppliesLeft=$purchaseValue
         
-        cashLeft=$((startingBudget - animalSpend - foodLeft - ammoLeft - clothingLeft \
+        cashLeft=$((startingBudget - animalPower - foodLeft - ammoLeft - clothingLeft \
                 - suppliesLeft))
             
         if [ $cashLeft -lt 0 ]
@@ -262,7 +262,7 @@ deathSequence() {
     read
     echo "Would you like a fancy funeral?"
     read
-    echo "Would you like us to inform yout next of kin?"
+    echo "Would you like us to inform your next of kin?"
     read playerAnswer
     if [ $playerAnswer != "yes" ]
         then echo "Your aunt Nellie in St. Louis is anxious to hear."
@@ -343,6 +343,125 @@ eat() {
     done
 }
 
+attackOutcome() {
+    if [ $areRidersFriendly == 1 ]
+        then echo "todo friendly"
+        else {
+            echo "Riders were hostile--check for losses."
+            if [ $ammoLeft -lt 0 ]
+                then {
+                    echo "You ran out of bullets and got massacred by the riders."
+                    deathSequence
+                }
+            fi
+        }
+    fi
+}
+
+ridersShootingResult() {
+    if [ $shootingScore -le 1 ]
+        then echo "Nice shooting---you drove them off."
+        else if [ $shootingScore -gt 4 ]
+            then {
+                echo "Lousy shot---you got knifed."
+                isInjured=true
+                echo "You have to see ol' Doc Blanchard."
+            }
+            else echo "Kinda slow with your Colt .45."
+        fi
+    fi
+    attackOutcome
+}
+
+hostileRiders() {
+    case $tactic in 
+    
+        1)
+            ((distanceCovered+=20))
+            ((suppliesLeft-=15))
+            ((ammoLeft-=150))
+            ((animalPower-=40))
+            attackOutcome
+            ;;
+
+        2)
+            shoot
+            ammoLeft=$(($ammoLeft - $shootingScore * 40 - 80 ))
+            ridersShootingResult
+            ;;
+            
+        3)
+            if [ $(( $RANDOM % 10 )) -gt 8 ]
+                then echo "They did not attack."
+                else {
+                    ((ammoLeft-=150))
+                    ((suppliesLeft-=15))
+                    attackOutcome
+                }  
+            fi
+            ;;
+            
+        4)
+            shoot
+            ammoLeft=$(($ammoLeft - $shootingScore * 30 - 80 ))
+            ((distanceCovered-=25))
+            ridersShootingResult
+            ;;
+    esac
+}
+
+friendlyRiders() {
+    case $tactic in 
+    
+        1)
+            ((distanceCovered+=15))
+            ((animalPower-=10))
+            ;;
+
+        2)
+            ((distanceCovered-=5))
+            ((ammoLeft-=100))
+            ;;
+            
+        4)
+            ((distanceCovered-=20))
+            ;;
+    esac
+    
+    attackOutcome
+}
+
+riders() {
+    distanceFactor=$(( ($distanceCovered / 100 - 4) ** 2))
+    if [ $(( $RANDOM % 10 )) -le $(( ($distanceFactor + 72) / ($distanceFactor + 12) - 1 )) ]
+        then {
+            echo -n "Riders ahead.  They "
+            areRidersFriendly=0
+            if [ $(( $RANDOM % 10 )) -ge 7 ]; then echo -n "don't "; areRidersFriendly=1; fi
+            echo "look hostile."
+            echo "Tactics"
+            
+            isTacticSelected=false
+            until $isTacticSelected
+            do
+                echo "(1) Run  (2) Attack  (3) Continue  (4) Circle wagons"
+                echo "If you run you'll gain time but wear down your oxen."
+                echo "If you circle you'll lose time."
+                if [ $(( $RANDOM % 10 )) -le 2 ]; then areRidersFriendly=$((1 - $areRidersFriendly)); fi
+                read tactic
+                if [ $tactic -ge 1 ] && [ $tactic -le 4 ]
+                    then isTacticSelected=true
+                fi
+            done
+            
+            if [ $areRidersFriendly == 1 ]
+                then friendlyRiders
+                else hostileRiders
+            fi
+        }
+    fi
+}
+
 gameLoop() {
     gameOver=false
     until $gameOver
@@ -372,10 +491,12 @@ gameLoop() {
                 foodCheck
                 eat
                 
-                distanceCovered=$((distanceCovered +(200 + ($animalSpend - 220) / 5 + ($RANDOM % 10))))
+                distanceCovered=$((distanceCovered +(200 + ($animalPower - 220) / 5 + ($RANDOM % 10))))
                 
                 isBlizzard=false
                 isInsufficientClothing=false
+                
+                riders
             }
         fi
     done

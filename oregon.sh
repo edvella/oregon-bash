@@ -462,6 +462,130 @@ riders() {
     fi
 }
 
+coldWeather() {
+    echo "ColdWeather todo"
+}
+
+banditsAttack() {
+    echo "BanditsAttack todo"
+}
+
+wildAnimalAttack() {
+    echo "wildAnimalAttack todo"
+}
+
+randomEvents() {
+    eventCounter=0
+    randomEvent=$(($RANDOM % 100))
+    eventNumber=( 6 11 13 15 17 22 32 35 37 42 44 54 64 69 95 )
+    eventCompleted=false
+    
+    until $eventCompleted
+    do
+        if [ $eventCounter == 16 ] || [ ${eventNumber[$eventCounter]} -gt $randomEvent ] 
+            then eventCompleted=true;
+        fi
+        
+        ((eventCounter++))
+    done
+    
+    case $eventCounter in
+        1)
+            echo "Wagon breaks down--lose time and supplies fixing it."
+            distanceCovered=$(($distanceCovered - 15 - ($RANDOM % 5)))
+            ((suppliesLeft-=8))
+            ;;
+        2)
+            echo "Ox injures leg---slows you down rest of trip."
+            ((distanceCovered-=25))
+            ((animalPower-=20))
+            ;;
+        3)
+            echo "Bad luck---your daughter broke her arm."
+            echo "You had to stop and use supplies to make a sling."
+            distanceCovered=$(($distanceCovered - 5 - ($RANDOM % 4)))
+            suppliesLeft=$(($suppliesLeft - 2 - ($RANDOM % 3)))
+            ;;
+        4)
+            echo "Ox wanders off---spend time looking for it."
+            ((distanceCovered-=17))
+            ;;
+        5)
+            echo "Your son gets lost===spend half the day looking for him."
+            ((distanceCovered-=10))
+            ;;
+        6)
+            echo "Unsafe water--lose time looking for clean spring."
+            distanceCovered=$(($distanceCovered - 2 - ($RANDOM % 10)))
+            ;;
+        7)
+            if [ $distanceCovered -gt 950 ]
+                then coldWeather
+                else {
+                    echo "Heavy rains---time and supplies lost."
+                    ((foodLeft-=10))
+                    ((ammoLeft-=500))
+                    ((suppliesLeft-=15))
+                    distanceCovered=$(($distanceCovered - 5 - ($RANDOM % 10)))
+                }
+            fi
+            ;;
+        8)
+            echo "Bandits attack."
+            banditsAttack
+            ;;
+        9)
+            echo "There was a fire in your wagon--food and supplies damaged."
+            ((foodLeft-=40))
+            ((ammoLeft-=400))
+            suppliesLeft=$(($suppliesLeft - 3 - ($RANDOM % 8)))
+            ((distanceCovered-=15))
+            ;;
+        10)
+            echo "Lose your way in heavy fog--time is lost."
+            distanceCovered=$(($distanceCovered - 10 - ($RANDOM % 5)))
+            ;;
+        11)
+            echo "You killed a poisonous snake after it bit you."
+            ((ammoLeft-=10))
+            ((suppliesLeft-=5))
+            if [ $suppliesLeft -lt 0 ]
+                then {
+                    echo "You die of snakebite since you have no medicine."
+                    deathSequence
+                }
+            fi
+            ;;
+        12)
+            echo "Wagon gets swamped fording river--lose food and clothes."
+            ((foodLeft-=30))
+            ((clothingLeft-=20))
+            distanceCovered=$(($distanceCovered - 20 - ($RANDOM % 20)))
+            ;;
+        13)
+            echo "Wild animals attack!"
+            wildAnimalAttack
+            ;;
+        14)
+            echo "Hail storm---supplies damaged."
+            distanceCovered=$(($distanceCovered - 5 - ($RANDOM % 10)))
+            ((ammoLeft-=200))
+            suppliesLeft=$(($suppliesLeft - 4 - ($RANDOM % 3)))
+            ;;
+            
+            # todo events 15 and 16
+            
+        17)
+            echo "Helpful Indians show you where to find more food."
+            ((foodLeft+=14))
+            eventCompleted=true
+            ;;
+    esac
+    
+    echo $eventCounter
+    echo $randomEvent
+}
+
 gameLoop() {
     gameOver=false
     until $gameOver
@@ -469,7 +593,7 @@ gameLoop() {
         if [ $distanceCovered -ge 2040 ] || [ $turnNumber -gt 17 ]
             then finalTurn; ganeOver=true
             else {
-                # printDate
+                printDate
                 ((turnNumber++))
                 
                 if [ $foodLeft -lt 0 ]; then foodLeft=0; fi
@@ -497,6 +621,7 @@ gameLoop() {
                 isInsufficientClothing=false
                 
                 riders
+                randomEvents
             }
         fi
     done

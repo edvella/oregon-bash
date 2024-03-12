@@ -462,8 +462,60 @@ riders() {
     fi
 }
 
+illness() {
+    if [ $(($RANDOM % 100)) -ge $((10 + 35 * ($mealSize - 1))) ]
+        then if [ $(($RANDOM % 100)) -ge $((100 - (40 / 4 ** ($mealSize - 1)))) ]
+            then {
+                echo "Serious illness---"
+                echo "You must stop for medical attention."
+                ((suppliesLeft-=10))
+                isSick=true
+            }
+            else {
+                echo "Bad Illness---medicine used."
+                ((distanceCovered-=5))
+                ((suppliesLeft-=5))
+            }
+        fi
+        else {
+            echo "Mild illness---medicine used"
+            ((distanceCovered-=5))
+            ((suppliesLeft-=2))
+        }
+    fi
+    
+    if [ $suppliesLeft -lt 0 ]
+        then {
+            echo "You ran out of medical supplies."
+            echo -n "You died of "
+            if $isInjured
+                then echo "injuries."
+                else echo "pneumonia."
+            fi
+            deathSequence
+        }
+        else if $isBlizzard
+            then if [ $distanceCovered -le 950 ]
+                then isSouthPassCleared=true
+            fi
+            # todo 700?
+        fi
+    fi
+}
+
 coldWeather() {
-    echo "ColdWeather todo"
+    echo -n "Cold weather---BRRRRRRR!---you "
+    if [ $clothingLeft -le $((22 + $RANDOM % 4)) ]
+        then {
+            echo -n "don't "
+            isInsufficientClothing=true
+        }
+    fi
+    echo "have enough clothing to keep you warm."
+    
+    if $isInsufficientClothing
+        then illness
+    fi       
 }
 
 banditsAttack() {
@@ -477,6 +529,7 @@ wildAnimalAttack() {
 randomEvents() {
     eventCounter=0
     randomEvent=$(($RANDOM % 100))
+    randomEvent=31
     eventNumber=( 6 11 13 15 17 22 32 35 37 42 44 54 64 69 95 )
     eventCompleted=false
     
@@ -581,47 +634,44 @@ randomEvents() {
             eventCompleted=true
             ;;
     esac
-    
-    echo $eventCounter
-    echo $randomEvent
 }
 
 gameLoop() {
     gameOver=false
     until $gameOver
-    do
+    do              
+        if [ $foodLeft -lt 0 ]; then foodLeft=0; fi
+        if [ $ammoLeft -lt 0 ]; then ammoLeft=0; fi
+        if [ $clothingLeft -lt 0 ]; then clothingLeft=0; fi
+        if [ $suppliesLeft -lt 0 ]; then suppliesLeft=0; fi
+        
+        if [ $foodLeft -lt 12 ]
+            then echo "You'd better do some hunting or buy food and soon!!!!"
+        fi
+        
+        # todo: check for need to possibly round up numbers here (1055 - 1080)
+        mileageAtPreviousTurn=$distanceCovered
+        
+        checkIfDoctorNeeded
+        printMileage
+        printResourceTable
+        playerMove
+        foodCheck
+        eat
+        
+        distanceCovered=$((distanceCovered +(200 + ($animalPower - 220) / 5 + ($RANDOM % 10))))
+        
+        isBlizzard=false
+        isInsufficientClothing=false
+        
+        riders
+        randomEvents
+                
         if [ $distanceCovered -ge 2040 ] || [ $turnNumber -gt 17 ]
-            then finalTurn; ganeOver=true
+            then finalTurn; gameOver=true
             else {
                 printDate
-                ((turnNumber++))
-                
-                if [ $foodLeft -lt 0 ]; then foodLeft=0; fi
-                if [ $ammoLeft -lt 0 ]; then ammoLeft=0; fi
-                if [ $clothingLeft -lt 0 ]; then clothingLeft=0; fi
-                if [ $suppliesLeft -lt 0 ]; then suppliesLeft=0; fi
-                
-                if [ $foodLeft -lt 12 ]
-                    then echo "You'd better do some hunting or buy food and soon!!!!"
-                fi
-                
-                # todo: check for need to possibly round up numbers here (1055 - 1080)
-                mileageAtPreviousTurn=$distanceCovered
-                
-                checkIfDoctorNeeded
-                printMileage
-                printResourceTable
-                playerMove
-                foodCheck
-                eat
-                
-                distanceCovered=$((distanceCovered +(200 + ($animalPower - 220) / 5 + ($RANDOM % 10))))
-                
-                isBlizzard=false
-                isInsufficientClothing=false
-                
-                riders
-                randomEvents
+                ((turnNumber++))                
             }
         fi
     done

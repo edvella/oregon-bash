@@ -519,7 +519,36 @@ coldWeather() {
 }
 
 banditsAttack() {
-    echo "BanditsAttack todo"
+    shoot
+    ammoLeft=$(($ammoLeft - 20 * $shootingScore))
+    
+    if [ $ammoLeft -lt 0 ]
+        then {
+            echo "you ran out of bullets---they get lots of cash."
+            cashLeft=$(($cashLeft / 3))
+            isShot=true
+        }
+        else {
+            if [ $shootingScore -gt 1 ]
+                then isShot=true
+                else isShot=false
+            fi
+        }
+    fi
+    
+    if $isShot
+        then {
+            echo "You got shot in the leg and they took one of your oxen."
+            isInjured=true
+            echo "Better have a doc look at your wound."
+            ((suppliesLeft-=5))
+            ((animalPower-=20))
+        }
+        else {
+            echo "Quickest draw outside of Dodge City!!!"
+            echo "You got 'em!"
+        }
+    fi
 }
 
 wildAnimalAttack() {
@@ -529,7 +558,7 @@ wildAnimalAttack() {
 randomEvents() {
     eventCounter=0
     randomEvent=$(($RANDOM % 100))
-    randomEvent=31
+    randomEvent=33
     eventNumber=( 6 11 13 15 17 22 32 35 37 42 44 54 64 69 95 )
     eventCompleted=false
     

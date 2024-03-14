@@ -462,6 +462,15 @@ riders() {
     fi
 }
 
+deathCause() {
+    echo -n "You died of "
+    if $isInjured
+        then echo "injuries."
+        else echo "pneumonia."
+    fi
+    deathSequence
+}
+
 illness() {
     if [ $(($RANDOM % 100)) -ge $((10 + 35 * ($mealSize - 1))) ]
         then if [ $(($RANDOM % 100)) -ge $((100 - (40 / 4 ** ($mealSize - 1)))) ]
@@ -487,12 +496,7 @@ illness() {
     if [ $suppliesLeft -lt 0 ]
         then {
             echo "You ran out of medical supplies."
-            echo -n "You died of "
-            if $isInjured
-                then echo "injuries."
-                else echo "pneumonia."
-            fi
-            deathSequence
+            deathCause
         }
         else if $isBlizzard
             then if [ $distanceCovered -le 950 ]
@@ -524,7 +528,7 @@ banditsAttack() {
     
     if [ $ammoLeft -lt 0 ]
         then {
-            echo "you ran out of bullets---they get lots of cash."
+            echo "You ran out of bullets---they get lots of cash."
             cashLeft=$(($cashLeft / 3))
             isShot=true
         }
@@ -552,13 +556,30 @@ banditsAttack() {
 }
 
 wildAnimalAttack() {
-    echo "wildAnimalAttack todo"
+    shoot
+    if [ $ammoLeft -gt 39 ]
+        then {
+            if [ $shootingScore -gt 2 ]
+                then echo "Slow on the draw---they got at your food and clothes."
+                else echo "Nice shootin' pardner---they didn't get much."
+            fi
+            ammoLeft=$(($ammoLeft - 20 * $shootingScore))
+            clothingLeft=$(($clothingLeft - $shootingScore * 4))
+            foodLeft=$(($foodLeft - $shootingScore * 8))
+        }
+        else {
+            echo "You were too low on bullets--"
+            echo "The wolves overpowered you."
+            isInjured=true
+            deathCause
+        }
+    fi
 }
 
 randomEvents() {
     eventCounter=0
     randomEvent=$(($RANDOM % 100))
-    randomEvent=33
+    randomEvent=55
     eventNumber=( 6 11 13 15 17 22 32 35 37 42 44 54 64 69 95 )
     eventCompleted=false
     

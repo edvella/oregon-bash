@@ -18,7 +18,9 @@ distanceCovered=0
 turnNumber=0
 isInjured=false
 isSick=false
-southPassFlag=false
+southPassClearanceFlag=0
+blueMountainClearanceFlag=0
+southPassMileageFlag=0
 canVisitFort=false
 fortSpending=0
 shootingScore=0
@@ -137,10 +139,10 @@ init() {
     canVisitFort=false
     isInjured=false
     isSick=false
-    F1=0
-    F2=0
+    southPassClearanceFlag=0
+    blueMountainClearanceFlag=0
     distanceCovered=0
-    southPassFlag=false
+    southPassMileageFlag=0
     turnNumber=0
     
     preparations
@@ -167,8 +169,8 @@ checkIfDoctorNeeded() {
 }
 
 printMileage() {
-    if $southPassFlag
-        then echo "Total mileage is 950"; southPassFlag=false
+    if [ $southPassMileageFlag == 1 ]
+        then echo "Total mileage is 950"; southPassMileageFlag=0
         else echo "Total mileage is ${distanceCovered}"
     fi
 }
@@ -500,7 +502,7 @@ illness() {
         }
         else if $isBlizzard
             then if [ $distanceCovered -le 950 ]
-                then isSouthPassCleared=true
+                then southPassClearanceFlag=1
             fi
             # todo 700?
         fi
@@ -579,8 +581,8 @@ wildAnimalAttack() {
 randomEvents() {
     eventCounter=0
     randomEvent=$(($RANDOM % 100))
-    randomEvent=55
-    eventNumber=( 6 11 13 15 17 22 32 35 37 42 44 54 64 69 95 )
+    randomEvent=99
+    eventNumber=( 6 11 13 15 17 22 32 35 37 42 44 54 64 69 95 100)
     eventCompleted=false
     
     until $eventCompleted
@@ -676,14 +678,79 @@ randomEvents() {
             suppliesLeft=$(($suppliesLeft - 4 - ($RANDOM % 3)))
             ;;
             
-            # todo events 15 and 16
+            # todo event 15
             
-        17)
+        16)
             echo "Helpful Indians show you where to find more food."
             ((foodLeft+=14))
             eventCompleted=true
             ;;
     esac
+}
+
+blizzard() {
+    echo "Blizzard in mountain pass--time and supplies lost."
+    isBlizzard=true
+    ((foodLeft-=25))
+    ((suppliesLeft-=10))
+    ((ammoLeft-=300))
+    distanceCovered=$(($distanceCovered - 30 - ($RANDOM % 40)))
+    if [ $clothingLeft -lt $((18 + ($RANDOM % 2))) ]; then illness; fi
+}
+
+mountains() {
+    if [ $distanceCovered -gt 950 ]
+        then {
+            if [ $(($RANDOM % 10)) -le $((9 - (($distanceCovered / 100 - 15) ** 2 + 72) / (($distanceCovered / 100 - 15) ** 2 + 12))) ]
+                then {
+                    echo "Rugged Mountains"
+                    if [ $(($RANDOM % 10)) -gt 1 ]
+                        then if [ $(($RANDOM % 100)) -gt 11 ]
+                            then {
+                                echo "The going gets slow."
+                                distanceCovered=$(($distanceCovered - 45 - ($RANDOM % 50)))
+                            }
+                            else {
+                                echo "Wagon damaged!---lose time and supplies."
+                                ((suppliesLeft-=5))
+                                ((ammoLeft-=200))
+                                distanceCovered=$(($distanceCovered - 20 - ($RANDOM % 30)))
+                            }
+                        fi
+                        else {
+                            echo "You got lost---lose valuable time trying to find trail!"
+                            ((distanceCovered-=60))
+                        }
+                    fi
+                    
+                    if [ $southPassClearanceFlag == 0 ]
+                        then {
+                            southPassClearanceFlag=1
+                            if [ $(($RANDOM % 10)) -lt 8 ]
+                                then blizzard
+                                else {
+                                    echo "You made it safely through South Pass--no snow."
+                                }
+                            fi
+                        }
+                    fi
+                    
+                    if [ $distanceCoverted -ge 1700 ] && [ $blueMountainClearanceFlag == 0 ]
+                        then {
+                            blueMountainClearanceFlag=1
+                            if [ $(($RANDOM % 10)) -lt 7 ]
+                                then blizzard
+                            fi
+                        }
+                    fi
+                    
+                    if [ $distanceCovered -le 950 ]
+                        then southPassMileageFlag=1
+                    fi
+                }
+            fi
+        }
+    fi
 }
 
 gameLoop() {
@@ -716,6 +783,7 @@ gameLoop() {
         
         riders
         randomEvents
+        mountains
                 
         if [ $distanceCovered -ge 2040 ] || [ $turnNumber -gt 17 ]
             then finalTurn; gameOver=true

@@ -154,8 +154,41 @@ printDate() {
     echo
 }
 
-finalTurn() { 
-    echo "todo"
+negativeValueCheck() {
+    if [ $foodLeft -lt 0 ]; then foodLeft=0; fi
+    if [ $ammoLeft -lt 0 ]; then ammoLeft=0; fi
+    if [ $clothingLeft -lt 0 ]; then clothingLeft=0; fi
+    if [ $suppliesLeft -lt 0 ]; then suppliesLeft=0; fi
+}
+
+printResourceTable() {
+    negativeValueCheck
+    if [ $cashLeft -lt 0 ]; then cashLeft=0; fi
+    printf "%-15s%-15s%-15s%-15s%-15s\n" "Food" "Bullets" "Clothing" "Misc. Supp." "Cash"
+    printf "%-15s%-15s%-15s%-15s%-15s\n" "${foodLeft}" "${ammoLeft}" "${clothingLeft}" "${suppliesLeft}" "${cashLeft}"
+}
+
+finalTurn() {
+    ((twoWeekFraction=((2040 - $mileageAtPreviousTurn) * 1000) / ($distanceCovered - $mileageAtPreviousTurn)))
+    foodLeft=$(($foodLeft + (1000 - $twoWeekFraction) * (8 + 5 * $mealSize) / 1000))
+    
+    printf "\nYou\a finally arri\aved at Ore\agon City\a\n"
+    printf "after\a 2040 long miles\a---hooray!!\a!!\n\n"
+    
+    twoWeekFraction=$(($twoWeekFraction * 14 / 1000))
+    turnNumber=$(($turnNumber * 14 + $twoWeekFraction))
+    ((twoWeekFraction++))
+    echo $(date -d "18470329 $turnNumber days" +'%A %B %d %Y')
+    echo
+    printResourceTable
+    echo
+    echo "President James K. Polk sends you his"
+    echo "      heartiest congratulations"
+    echo
+    echo "           and wishes you a prosperous life ahead"
+    echo
+    echo "                      at your new home."
+    exit 0
 }
 
 checkIfDoctorNeeded() {
@@ -173,13 +206,6 @@ printMileage() {
         then echo "Total mileage is 950"; southPassMileageFlag=0
         else echo "Total mileage is ${distanceCovered}"
     fi
-}
-
-printResourceTable() {
-    #printf "Food\tBullets\tClothing\tMisc. Supp.\tCash\n"
-    #("Food", "Bullets", "Clothing", "Misc. Supp.", "Cash") | xargs -n5 printf "%-15s"
-    printf "%-15s%-15s%-15s%-15s%-15s\n" "Food" "Bullets" "Clothing" "Misc. Supp." "Cash"
-    printf "%-15s%-15s%-15s%-15s%-15s\n" "${foodLeft}" "${ammoLeft}" "${clothingLeft}" "${suppliesLeft}" "${cashLeft}"
 }
 
 fortShop() {
@@ -581,7 +607,6 @@ wildAnimalAttack() {
 randomEvents() {
     eventCounter=0
     randomEvent=$(($RANDOM % 100))
-    randomEvent=99
     eventNumber=( 6 11 13 15 17 22 32 35 37 42 44 54 64 69 95 100)
     eventCompleted=false
     
@@ -757,10 +782,7 @@ gameLoop() {
     gameOver=false
     until $gameOver
     do              
-        if [ $foodLeft -lt 0 ]; then foodLeft=0; fi
-        if [ $ammoLeft -lt 0 ]; then ammoLeft=0; fi
-        if [ $clothingLeft -lt 0 ]; then clothingLeft=0; fi
-        if [ $suppliesLeft -lt 0 ]; then suppliesLeft=0; fi
+        negativeValueCheck
         
         if [ $foodLeft -lt 12 ]
             then echo "You'd better do some hunting or buy food and soon!!!!"
@@ -784,7 +806,7 @@ gameLoop() {
         riders
         randomEvents
         mountains
-                
+
         if [ $distanceCovered -ge 2040 ] || [ $turnNumber -gt 17 ]
             then finalTurn; gameOver=true
             else {

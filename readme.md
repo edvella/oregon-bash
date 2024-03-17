@@ -1,10 +1,11 @@
-A port of the 1975 MECC version of The Oregon Trail, written in Bash.
+# The Oregon Trail
+## A port of the 1975 MECC version of The Oregon Trail, written in Bash.
 
 Done as an exercise after too much time spent away from Linux.
 
 In this port, I have kept most of the original wording and punctuation and only took the decision to change where I felt that it improved the interaction with the player by avoiding confusion.
 
-# Game Information
+## Game Information
 This program simulates a trip over the Oregon Trail from
 Independence, Missouri to Oregon City, Oregon in 1847.
 Your family of five will cover the 2000 mile Oregon Trail
@@ -49,8 +50,8 @@ When asked to enter money amounts, don't use a '$'.
 
 Good luck!!!
 
-# Downloading the game script
-To download the game, you can either clone this repo or otherwise directly save [this file](https://raw.githubusercontent.com/edvella/oregon-bash/main/oregon.sh)
+## Downloading the game script
+To download the game, you can either clone this repo or otherwise directly save [this file](https://raw.githubusercontent.com/edvella/oregon-bash/main/oregon.sh).
 
 The downloaded file needs to be set up as an executable file before it can be run the first time using the chmod command:
 
@@ -58,7 +59,7 @@ The downloaded file needs to be set up as an executable file before it can be ru
 chmod +x oregon.sh
 ```
 
-# Running the game
+## Running the game
 To run the game, open a bash terminal, change directory to the game folder and type the following command to run the game script:
 
 ```
@@ -73,7 +74,7 @@ chmod +x oregon.sh
 ./oregon.sh
 ```
 
-# Music played during development:
+## Music played during development:
 - Tchaikovsky: Swan Lake - performed by the London Symphony Orchestra (1976)
 - ...And Justice for All - Metallica (1988)
 - Agents of Fortune - Blue Öyster Cult (1976)

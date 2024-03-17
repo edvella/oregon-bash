@@ -49,11 +49,28 @@ When asked to enter money amounts, don't use a '$'.
 
 Good luck!!!
 
-# Running the game
-To run the game, open bash and change to the game folder and type the following command to run the game script:
+# Downloading the game script
+To download the game, you can either clone this repo or otherwise directly save [this file](https://raw.githubusercontent.com/edvella/oregon-bash/main/oregon.sh)
+
+The downloaded file needs to be set up as an executable file before it can be run the first time using the chmod command:
 
 ```
-    ./oregon.sh
+chmod +x oregon.sh
+```
+
+# Running the game
+To run the game, open a bash terminal, change directory to the game folder and type the following command to run the game script:
+
+```
+./oregon.sh
+```
+
+So, putting it all together:
+
+```
+cd oregon-bash/
+chmod +x oregon.sh
+./oregon.sh
 ```
 
 # Music played during development:

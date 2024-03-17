@@ -373,7 +373,7 @@ eat() {
 
 attackOutcome() {
     if [ $areRidersFriendly == 1 ]
-        then echo "todo friendly"
+        then echo "Riders were friendly, but check for possible losses."
         else {
             echo "Riders were hostile--check for losses."
             if [ $ammoLeft -lt 0 ]

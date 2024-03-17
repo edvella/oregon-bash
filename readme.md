@@ -51,16 +51,18 @@ Good luck!!!
 
 # Running the game
 To run the game, open bash and change to the game folder and type the following command to run the game script:
+
+```
     ./oregon.sh
+```
 
-
-Music played during development:
-Tchaikovsky: Swan Lake - performed by the London Symphony Orchestra (1976)
-...And Justice for All - Metallica (1988)
-Agents of Fortune - Blue Öyster Cult (1976)
-Use Your Illusion I - Guns N' Roses (1991)
-Goats Head Soup - The Rolling Stones (1973)
-Meteora - Linkin Park (2003)
-The Works - Queen (1984)
-Mozart: Requiem in D Minor - performed by the Slovak Philarmonic Orchestra (1989)
-L'Incredibile Renato Carosone (1954)
+# Music played during development:
+- Tchaikovsky: Swan Lake - performed by the London Symphony Orchestra (1976)
+- ...And Justice for All - Metallica (1988)
+- Agents of Fortune - Blue Öyster Cult (1976)
+- Use Your Illusion I - Guns N' Roses (1991)
+- Goats Head Soup - The Rolling Stones (1973)
+- Meteora - Linkin Park (2003)
+- The Works - Queen (1984)
+- Mozart: Requiem in D Minor - performed by the Slovak Philarmonic Orchestra (1989)
+- L'Incredibile Renato Carosone (1954)

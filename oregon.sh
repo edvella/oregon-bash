@@ -237,16 +237,15 @@ stopAtFort() {
 }
 
 shoot() {
-    echo "Type bang"
     startTime=$(date +%s)
-    read -t 7 -N 4
+    read -p "Type bang" -t 7 -s
     endTime=$(date +%s)
     echo
     
-    if [ $REPLY == "bang" ]
+    if [[ ! -z "$REPLY" ]] && [ $REPLY == "bang" ]
         then ((shootingScore=$endTime - startTime))
         else ((shootingScore=7))
-    fi
+    fi    
 }
 
 hunt() {

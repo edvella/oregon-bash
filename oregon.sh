@@ -530,7 +530,6 @@ illness() {
             then if [ $distanceCovered -le 950 ]
                 then southPassClearanceFlag=1
             fi
-            # todo 700?
         fi
     fi
 }
@@ -703,7 +702,11 @@ randomEvents() {
             suppliesLeft=$(($suppliesLeft - 4 - ($RANDOM % 3)))
             ;;
             
-            # todo event 15
+        15)
+            if [ $mealSize == 1 ] || ([ $mealSize == 2 ] && [ $(($RANDOM % 100)) -gt 25 ]) || ([ $mealSize == 3 ] && [ $(($RANDOM % 100)) -lt 50 ])
+                then illness
+            fi
+            ;;
             
         16)
             echo "Helpful Indians show you where to find more food."
@@ -760,7 +763,7 @@ mountains() {
                         }
                     fi
                     
-                    if [ $distanceCoverted -ge 1700 ] && [ $blueMountainClearanceFlag == 0 ]
+                    if [ $distanceCovered -ge 1700 ] && [ $blueMountainClearanceFlag == 0 ]
                         then {
                             blueMountainClearanceFlag=1
                             if [ $(($RANDOM % 10)) -lt 7 ]
@@ -788,7 +791,6 @@ gameLoop() {
             then echo "You'd better do some hunting or buy food and soon!!!!"
         fi
         
-        # todo: check for need to possibly round up numbers here (1055 - 1080)
         mileageAtPreviousTurn=$distanceCovered
         
         checkIfDoctorNeeded
